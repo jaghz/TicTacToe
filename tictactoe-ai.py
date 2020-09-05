@@ -41,13 +41,12 @@ def makeMove(board, moveCoords, player1 = True):
     # Make a new board with the given board, 
     # and input the player's move coordinates depending on if they are player1
     # or player 2. Then return the new board.
-        
-    newBoard = board
+
     if player1 is True:
-        newBoard[moveCoords[0]][moveCoords[1]] = 'x'
+        board[moveCoords[0]][moveCoords[1]] = 'x'
     else:
-        newBoard[moveCoords[0]][moveCoords[1]] = 'o'
-    return newBoard
+        board[moveCoords[0]][moveCoords[1]] = 'o'
+    return board
 
         
 
@@ -90,18 +89,25 @@ def getWinner(board):
     for listele in boardList:
         allsame = True
         for i in range(len(listele)):
+            if listele[i] == 'o ' or listele[i] == ' o' or listele[i] == ' o ':
+                listele[i] = 'o'
+            if listele[i] == 'x ' or listele[i] == ' x' or listele[i] == ' x ':
+                listele[i] = 'x'
             compare = listele[0]
 
             if listele[i] != compare:
                 allsame = False
+
         if allsame == True:
             if compare == 'x' or compare == 'o':
+
                 return(compare)
+    #print(boardList)
     return None
-    
-        
+
 def isBoardFull(board):
     isFull = True
+    #print(board)
     for i in range(len(board)):
         for j in range(len(board[0])):
             if board[i][j] == ' ':
@@ -110,14 +116,15 @@ def isBoardFull(board):
     
 def isTerminal(board):
     winner = getWinner(board)
+
     if winner == 'x':
         return(10)
     elif winner == 'o':
         return(-10)
     elif isBoardFull(board):
         return(0)
-    else:
-        return None
+    return None
+   
 def possibleMoves(board):
     possibleMoves=[]
     for i in range(len(board)):
@@ -125,38 +132,43 @@ def possibleMoves(board):
             if board[i][j] == ' ':
                 possibleMoves.append((i,j))
     return(possibleMoves)
-board = [['o', ' ', 'o'],['x ', ' ', 'x'],['x', 'o', 'x']]
+board = [['o', 'o', ' '],[' ', 'x', 'x'],['x', ' ', ' ']]
 def miniMax(board, player1):
-    player1=not player1
     #base case:
     if isTerminal(board) is not None:
+
         return isTerminal(board)
     scores = []
+
     for move in possibleMoves(board):
         newBoard = copy.deepcopy(board)
+
         nextMove = makeMove(newBoard, move, player1)
-        score = miniMax(newBoard,player1)
+
+        score = miniMax(nextMove, not player1)
         scores.append(score)
+
     if player1 == True:
         return(max(scores))
     else:
         return(min(scores))
    
-        
-def perfectAI(board, player):
+     
+def perfectAI(board, player1=False):
     moves = possibleMoves(board)
-    
+
     bestScore = None
     bestMove=None
+    
     for move in moves:
         newBoard = copy.deepcopy(board)
-        moveScore = miniMax(newBoard, player)
+
+        moveScore = miniMax(newBoard, player1)
         if bestScore is None or moveScore < bestScore:
             bestMove = move
             bestScore = moveScore
-            print(bestMove, bestScore)
     return bestMove
-    
+
 def runGame():
     #Creating the board
     x = newBoard()
@@ -177,7 +189,7 @@ def runGame():
         else:
             print("Player 2's turn.")
             print("Thinking...")
-            nextMove = makeMove(x, perfectAI(nextMove, False), player1)
+            nextMove = makeMove(x, perfectAI(nextMove), player1)
             renderBoard(nextMove)
             winner = getWinner(nextMove)
             
